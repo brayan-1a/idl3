@@ -11,27 +11,27 @@ supabase: Client = create_client(url, key)
 
 # Funciones para interactuar con las tablas
 def get_clientes():
-    response = supabase.from_("clientes").select("*")
+    response = supabase.from_("hotel.clientes").select("*")
     return response.execute()
 
 def get_habitaciones():
-    response = supabase.from_("habitaciones").select("*")
+    response = supabase.from_("hotel.habitaciones").select("*")
     return response.execute()
 
 def get_reservas():
-    response = supabase.from_("reservas").select("*")
+    response = supabase.from_("hotel.reservas").select("*")
     return response.execute()
 
 def get_ventas():
-    response = supabase.from_("ventas").select("*")
+    response = supabase.from_("hotel.ventas").select("*")
     return response.execute()
 
 def get_promociones():
-    response = supabase.from_("promociones").select("*")
+    response = supabase.from_("hotel.promociones").select("*")
     return response.execute()
 
 def get_promociones_reservas():
-    response = supabase.from_("promociones_reservas").select("*")
+    response = supabase.from_("hotel.promociones_reservas").select("*")
     return response.execute()
 
 # Página principal
