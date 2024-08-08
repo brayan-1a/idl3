@@ -1,93 +1,101 @@
 import streamlit as st
-from supabase import create_client, Client
 import pandas as pd
+from supabase import create_client, Client
 
 # Configuración de Supabase
-URL = "https://clmdobighgagqdqwfclt.supabase.co"
-KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbWRvYmlnaGdhZ3FkcXdmY2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0NzMzMDYsImV4cCI6MjAzODA0OTMwNn0.7pncUo2SvBwi1Jnxl863e9-omO8fGulmZC3_zhUVFTM"
-supabase: Client = create_client(URL, KEY)
+url = "https://clmdobighgagqdqwfclt.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbWRvYmlnaGdhZ3FkcXdmY2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0NzMzMDYsImV4cCI6MjAzODA0OTMwNn0.7pncUo2SvBwi1Jnxl863e9-omO8fGulmZC3_zhUVFTM"
 
-st.title("Sistema de Gestión de Hotel")
+# Crear cliente de Supabase
+supabase: Client = create_client(url, key)
 
-# Selección de operación
-option = st.sidebar.selectbox(
-    '¿Qué operación desea realizar?',
-    ('Consultar Clientes', 'Consultar Habitaciones', 'Consultar Reservas', 'Consultar Ventas', 'Consultar Promociones', 'Generar Reserva')
-)
+# Funciones para interactuar con las tablas
+def get_clientes():
+    response = supabase.from_("clientes").select("*")
+    return response.execute()
 
-if option == 'Consultar Clientes':
-    try:
-        clientes = supabase.table('hotel.clientes').select('*').execute()
-        df_clientes = pd.DataFrame(clientes.data)
-        st.write(df_clientes)
-    except Exception as e:
-        st.error(f"Error al consultar clientes: {e}")
+def get_habitaciones():
+    response = supabase.from_("habitaciones").select("*")
+    return response.execute()
 
-elif option == 'Consultar Habitaciones':
-    try:
-        habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
-        df_habitaciones = pd.DataFrame(habitaciones.data)
-        st.write(df_habitaciones)
-    except Exception as e:
-        st.error(f"Error al consultar habitaciones: {e}")
+def get_reservas():
+    response = supabase.from_("reservas").select("*")
+    return response.execute()
 
-elif option == 'Consultar Reservas':
-    try:
-        reservas = supabase.table('hotel.reservas').select('*').execute()
-        df_reservas = pd.DataFrame(reservas.data)
-        st.write(df_reservas)
-    except Exception as e:
-        st.error(f"Error al consultar reservas: {e}")
+def get_ventas():
+    response = supabase.from_("ventas").select("*")
+    return response.execute()
 
-elif option == 'Consultar Ventas':
-    try:
-        ventas = supabase.table('hotel.ventas').select('*').execute()
-        df_ventas = pd.DataFrame(ventas.data)
-        st.write(df_ventas)
-    except Exception as e:
-        st.error(f"Error al consultar ventas: {e}")
+def get_promociones():
+    response = supabase.from_("promociones").select("*")
+    return response.execute()
 
-elif option == 'Consultar Promociones':
-    try:
-        promociones = supabase.table('hotel.promociones').select('*').execute()
-        df_promociones = pd.DataFrame(promociones.data)
-        st.write(df_promociones)
-    except Exception as e:
-        st.error(f"Error al consultar promociones: {e}")
+def get_promociones_reservas():
+    response = supabase.from_("promociones_reservas").select("*")
+    return response.execute()
 
-elif option == 'Generar Reserva':
-    st.subheader("Generar Reserva")
-    
-    # Datos del cliente
-    cliente_id = st.number_input("ID del Cliente", min_value=1)
-    
-    # Selección de habitación
-    try:
-        habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
-        df_habitaciones = pd.DataFrame(habitaciones.data)
-        selected_habitacion = st.selectbox("Seleccione habitación", df_habitaciones['id_habitacion'])
-    except Exception as e:
-        st.error(f"Error al consultar habitaciones: {e}")
-    
-    # Fechas de la reserva
-    fecha_inicio = st.date_input("Fecha de inicio")
-    fecha_fin = st.date_input("Fecha de fin")
-    
-    if st.button('Crear Reserva'):
-        try:
-            reserva = supabase.table('hotel.reservas').insert({
-                'id_cliente': cliente_id,
-                'id_habitacion': selected_habitacion,
-                'fecha_inicio': fecha_inicio,
-                'fecha_fin': fecha_fin,
-                'estado': 'Confirmada'
-            }).execute()
-            if reserva.status_code == 201:
-                st.success("Reserva creada exitosamente")
-            else:
-                st.error(f"Error al crear la reserva: {reserva.error_message}")
-        except Exception as e:
-            st.error(f"Error al crear la reserva: {e}")
+# Página principal
+st.title("App de Hotel")
+
+# Sección de clientes
+st.header("Clientes")
+clientes = get_clientes()
+df_clientes = pd.DataFrame(clientes.data)
+st.write(df_clientes)
+
+# Botón para agregar cliente
+if st.button("Agregar cliente"):
+    st.write("Agregar cliente")
+
+# Sección de habitaciones
+st.header("Habitaciones")
+habitaciones = get_habitaciones()
+df_habitaciones = pd.DataFrame(habitaciones.data)
+st.write(df_habitaciones)
+
+# Botón para agregar habitación
+if st.button("Agregar habitación"):
+    st.write("Agregar habitación")
+
+# Sección de reservas
+st.header("Reservas")
+reservas = get_reservas()
+df_reservas = pd.DataFrame(reservas.data)
+st.write(df_reservas)
+
+# Botón para agregar reserva
+if st.button("Agregar reserva"):
+    st.write("Agregar reserva")
+
+# Sección de ventas
+st.header("Ventas")
+ventas = get_ventas()
+df_ventas = pd.DataFrame(ventas.data)
+st.write(df_ventas)
+
+# Botón para agregar venta
+if st.button("Agregar venta"):
+    st.write("Agregar venta")
+
+# Sección de promociones
+st.header("Promociones")
+promociones = get_promociones()
+df_promociones = pd.DataFrame(promociones.data)
+st.write(df_promociones)
+
+# Botón para agregar promoción
+if st.button("Agregar promoción"):
+    st.write("Agregar promoción")
+
+# Sección de promociones-reservas
+st.header("Promociones-reservas")
+promociones_reservas = get_promociones_reservas()
+df_promociones_reservas = pd.DataFrame(promociones_reservas.data)
+st.write(df_promociones_reservas)
+
+# Botón para agregar promoción-reserva
+if st.button("Agregar promoción-reserva"):
+    st.write("Agregar promoción-reserva")
 
 
 
