@@ -18,27 +18,27 @@ option = st.selectbox(
 )
 
 if option == 'Consultar Clientes':
-    clientes = supabase.table('Clientes').select('*').execute()
+    clientes = supabase.table('clientes').select('*').execute()
     df_clientes = pd.DataFrame(clientes.data)
     st.write(df_clientes)
 
 elif option == 'Consultar Habitaciones':
-    habitaciones = supabase.table('Habitaciones').select('*').execute()
+    habitaciones = supabase.table('habitaciones').select('*').execute()
     df_habitaciones = pd.DataFrame(habitaciones.data)
     st.write(df_habitaciones)
 
 elif option == 'Consultar Reservas':
-    reservas = supabase.table('Reservas').select('*').execute()
+    reservas = supabase.table('reservas').select('*').execute()
     df_reservas = pd.DataFrame(reservas.data)
     st.write(df_reservas)
 
 elif option == 'Consultar Ventas':
-    ventas = supabase.table('Ventas').select('*').execute()
+    ventas = supabase.table('ventas').select('*').execute()
     df_ventas = pd.DataFrame(ventas.data)
     st.write(df_ventas)
 
 elif option == 'Consultar Promociones':
-    promociones = supabase.table('Promociones').select('*').execute()
+    promociones = supabase.table('promociones').select('*').execute()
     df_promociones = pd.DataFrame(promociones.data)
     st.write(df_promociones)
 
@@ -47,7 +47,7 @@ elif option == 'Generar Reserva':
     cliente_id = st.number_input("ID del Cliente", min_value=1)
     
     # Datos de la habitación
-    habitaciones = supabase.table('Habitaciones').select('*').execute()
+    habitaciones = supabase.table('habitaciones').select('*').execute()
     df_habitaciones = pd.DataFrame(habitaciones.data)
     selected_habitacion = st.selectbox("Seleccione una habitación", df_habitaciones['id_habitacion'])
     
@@ -57,7 +57,7 @@ elif option == 'Generar Reserva':
     
     # Generar reserva
     if st.button('Generar Reserva'):
-        reserva = supabase.table('Reservas').insert({
+        reserva = supabase.table('reservas').insert({
             'id_cliente': cliente_id,
             'id_habitacion': selected_habitacion,
             'fecha_inicio': fecha_inicio,
