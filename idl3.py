@@ -16,29 +16,44 @@ option = st.sidebar.selectbox(
 )
 
 if option == 'Consultar Clientes':
-    clientes = supabase.table('hotel.clientes').select('*').execute()
-    df_clientes = pd.DataFrame(clientes.data)
-    st.write(df_clientes)
+    try:
+        clientes = supabase.table('hotel.clientes').select('*').execute()
+        df_clientes = pd.DataFrame(clientes.data)
+        st.write(df_clientes)
+    except Exception as e:
+        st.error(f"Error al consultar clientes: {e}")
 
 elif option == 'Consultar Habitaciones':
-    habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
-    df_habitaciones = pd.DataFrame(habitaciones.data)
-    st.write(df_habitaciones)
+    try:
+        habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
+        df_habitaciones = pd.DataFrame(habitaciones.data)
+        st.write(df_habitaciones)
+    except Exception as e:
+        st.error(f"Error al consultar habitaciones: {e}")
 
 elif option == 'Consultar Reservas':
-    reservas = supabase.table('hotel.reservas').select('*').execute()
-    df_reservas = pd.DataFrame(reservas.data)
-    st.write(df_reservas)
+    try:
+        reservas = supabase.table('hotel.reservas').select('*').execute()
+        df_reservas = pd.DataFrame(reservas.data)
+        st.write(df_reservas)
+    except Exception as e:
+        st.error(f"Error al consultar reservas: {e}")
 
 elif option == 'Consultar Ventas':
-    ventas = supabase.table('hotel.ventas').select('*').execute()
-    df_ventas = pd.DataFrame(ventas.data)
-    st.write(df_ventas)
+    try:
+        ventas = supabase.table('hotel.ventas').select('*').execute()
+        df_ventas = pd.DataFrame(ventas.data)
+        st.write(df_ventas)
+    except Exception as e:
+        st.error(f"Error al consultar ventas: {e}")
 
 elif option == 'Consultar Promociones':
-    promociones = supabase.table('hotel.promociones').select('*').execute()
-    df_promociones = pd.DataFrame(promociones.data)
-    st.write(df_promociones)
+    try:
+        promociones = supabase.table('hotel.promociones').select('*').execute()
+        df_promociones = pd.DataFrame(promociones.data)
+        st.write(df_promociones)
+    except Exception as e:
+        st.error(f"Error al consultar promociones: {e}")
 
 elif option == 'Generar Reserva':
     st.subheader("Generar Reserva")
@@ -47,25 +62,32 @@ elif option == 'Generar Reserva':
     cliente_id = st.number_input("ID del Cliente", min_value=1)
     
     # Selección de habitación
-    habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
-    df_habitaciones = pd.DataFrame(habitaciones.data)
-    selected_habitacion = st.selectbox("Seleccione habitación", df_habitaciones['id_habitacion'])
+    try:
+        habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
+        df_habitaciones = pd.DataFrame(habitaciones.data)
+        selected_habitacion = st.selectbox("Seleccione habitación", df_habitaciones['id_habitacion'])
+    except Exception as e:
+        st.error(f"Error al consultar habitaciones: {e}")
     
     # Fechas de la reserva
     fecha_inicio = st.date_input("Fecha de inicio")
     fecha_fin = st.date_input("Fecha de fin")
     
     if st.button('Crear Reserva'):
-        reserva = supabase.table('hotel.reservas').insert({
-            'id_cliente': cliente_id,
-            'id_habitacion': selected_habitacion,
-            'fecha_inicio': fecha_inicio,
-            'fecha_fin': fecha_fin,
-            'estado': 'Confirmada'
-        }).execute()
-        if reserva.status_code == 201:
-            st.success("Reserva creada exitosamente")
-        else:
-            st.error(f"Error al crear la reserva: {reserva.error_message}")
+        try:
+            reserva = supabase.table('hotel.reservas').insert({
+                'id_cliente': cliente_id,
+                'id_habitacion': selected_habitacion,
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_fin,
+                'estado': 'Confirmada'
+            }).execute()
+            if reserva.status_code == 201:
+                st.success("Reserva creada exitosamente")
+            else:
+                st.error(f"Error al crear la reserva: {reserva.error_message}")
+        except Exception as e:
+            st.error(f"Error al crear la reserva: {e}")
+
 
 
