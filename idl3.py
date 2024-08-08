@@ -41,61 +41,53 @@ st.title("App de Hotel")
 st.header("Clientes")
 clientes = get_clientes()
 df_clientes = pd.DataFrame(clientes.data)
-st.write(df_clientes)
 
-# Botón para agregar cliente
-if st.button("Agregar cliente"):
-    st.write("Agregar cliente")
+# Lista desplegable para seleccionar la tabla
+tabla_seleccionada = st.selectbox("Seleccione una tabla", ["Clientes", "Habitaciones", "Reservas", "Ventas", "Promociones", "Promociones-reservas"])
 
-# Sección de habitaciones
-st.header("Habitaciones")
-habitaciones = get_habitaciones()
-df_habitaciones = pd.DataFrame(habitaciones.data)
-st.write(df_habitaciones)
+# Botón para agregar datos
+if st.button("Agregar"):
+    if tabla_seleccionada == "Clientes":
+        nombre = st.text_input("Nombre")
+        apellido = st.text_input("Apellido")
+        email = st.text_input("Email")
+        telefono = st.text_input("Teléfono")
+        if st.button("Guardar"):
+            supabase.from_("clientes").insert({"nombre": nombre, "apellido": apellido, "email": email, "telefono": telefono}).execute()
+            st.success("Datos agregados con éxito")
+    elif tabla_seleccionada == "Habitaciones":
+        tipo = st.selectbox("Tipo", ["Simple", "Doble", "Suite"])
+        precio_por_noche = st.number_input("Precio por noche")
+        estado = st.selectbox("Estado", ["Disponible", "Ocupada", "En mantenimiento"])
+        if st.button("Guardar"):
+            supabase.from_("habitaciones").insert({"tipo": tipo, "precio_por_noche": precio_por_noche, "estado": estado}).execute()
+            st.success("Datos agregados con éxito")
+    # Agregar más casos para cada tabla
 
-# Botón para agregar habitación
-if st.button("Agregar habitación"):
-    st.write("Agregar habitación")
+# Botón para ver la tabla actualizada
+if st.button("Ver tabla"):
+    if tabla_seleccionada == "Clientes":
+        clientes = get_clientes()
+        df_clientes = pd.DataFrame(clientes.data)
+        st.write(df_clientes)
+    elif tabla_seleccionada == "Habitaciones":
+        habitaciones = get_habitaciones()
+        df_habitaciones = pd.DataFrame(habitaciones.data)
+        st.write(df_habitaciones)
+    # Agregar más casos para cada tabla
 
-# Sección de reservas
-st.header("Reservas")
-reservas = get_reservas()
-df_reservas = pd.DataFrame(reservas.data)
-st.write(df_reservas)
-
-# Botón para agregar reserva
-if st.button("Agregar reserva"):
-    st.write("Agregar reserva")
-
-# Sección de ventas
-st.header("Ventas")
-ventas = get_ventas()
-df_ventas = pd.DataFrame(ventas.data)
-st.write(df_ventas)
-
-# Botón para agregar venta
-if st.button("Agregar venta"):
-    st.write("Agregar venta")
-
-# Sección de promociones
-st.header("Promociones")
-promociones = get_promociones()
-df_promociones = pd.DataFrame(promociones.data)
-st.write(df_promociones)
-
-# Botón para agregar promoción
-if st.button("Agregar promoción"):
-    st.write("Agregar promoción")
-
-# Sección de promociones-reservas
-st.header("Promociones-reservas")
-promociones_reservas = get_promociones_reservas()
-df_promociones_reservas = pd.DataFrame(promociones_reservas.data)
-st.write(df_promociones_reservas)
-
-# Botón para agregar promoción-reserva
-if st.button("Agregar promoción-reserva"):
-    st.write("Agregar promoción-reserva")
-
+# Botón para borrar datos
+if st.button("Borrar"):
+    if tabla_seleccionada == "Clientes":
+        id_cliente = st.number_input("ID del cliente")
+        if st.button("Borrar"):
+            supabase.from_("clientes").delete().eq("id_cliente", id_cliente).execute()
+            st.success("Datos borrados con éxito")
+    elif tabla_seleccionada == "Habitaciones":
+        id_habitacion = st.number_input("ID de la habitación")
+        if st.button("Borrar"):
+            supabase.from_("habitaciones").delete().eq("id_habitacion", id_habitacion).execute()
+            st.success("Datos borrados con éxito")
+    # Agregar más casos para cada tabla
 
 
