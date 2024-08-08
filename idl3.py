@@ -1,72 +1,68 @@
 import streamlit as st
-import pandas as pd
 from supabase import create_client, Client
+import pandas as pd
 
 # Configuración de Supabase
 url = "https://cdubgkqitwvtbwtojjrw.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkdWJna3FpdHd2dGJ3dG9qanJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNDU5MDMsImV4cCI6MjAzODcyMTkwM30.2tir9-ogeojL_ueU3ogD1MD9p76GJ5OoVyKVCXKpphM"
 
 # Crear cliente de Supabase
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(URL, KEY)
 
-# Página principal
-st.title("App de Hotel")
+st.title("Sistema de Gestión de Hotel")
 
-# Sección de clientes
-st.header("Clientes")
+# Selección de operación
+option = st.selectbox(
+    '¿Qué operación desea realizar?',
+    ('Consultar Clientes', 'Consultar Habitaciones', 'Consultar Reservas', 'Consultar Ventas', 'Consultar Promociones', 'Generar Reserva')
+)
 
-# Funciones para interactuar con las tablas
-def get_clientes():
-    response = supabase.from_("clientes").select("*")
-    return response.execute()
-
-def get_habitaciones():
-    response = supabase.from_("habitaciones").select("*")
-    return response.execute()
-
-def get_reservas():
-    response = supabase.from_("reservas").select("*")
-    return response.execute()
-
-def get_ventas():
-    response = supabase.from_("ventas").select("*")
-    return response.execute()
-
-def get_promociones():
-    response = supabase.from_("promociones").select("*")
-    return response.execute()
-
-def get_promociones_reservas():
-    response = supabase.from_("promociones_reservas").select("*")
-    return response.execute()
-
-# Estado de la aplicación
-if 'datos' not in st.session_state:
-    st.session_state.datos = {}
-
-# Botón para agregar datos
-if st.button("Agregar"):
-    clientes = get_clientes()
+if option == 'Consultar Clientes':
+    clientes = supabase.table('Clientes').select('*').execute()
     df_clientes = pd.DataFrame(clientes.data)
-    if st.button("Guardar"):
-        try:
-            supabase.from_("clientes").insert({"nombre": "Nombre", "apellido": "Apellido", "email": "email@example.com", "telefono": "1234567890"}).execute()
-            st.session_state.datos["Clientes"] = pd.DataFrame({'Nombre': ["Nombre"], 'Apellido': ["Apellido"], 'Email': ["email@example.com"], 'Teléfono': ["1234567890"]})
-            st.success("Datos agregados con éxito")
-        except Exception as e:
-            st.error("Error al agregar datos: " + str(e))
+    st.write(df_clientes)
 
-# Botón para ver la tabla actualizada
-if st.button("Ver tabla"):
-    if "Clientes" in st.session_state.datos:
-        st.write(st.session_state.datos["Clientes"])
-    else:
-        st.write("No hay datos para mostrar")
+elif option == 'Consultar Habitaciones':
+    habitaciones = supabase.table('Habitaciones').select('*').execute()
+    df_habitaciones = pd.DataFrame(habitaciones.data)
+    st.write(df_habitaciones)
 
-# Botón para borrar datos
-if st.button("Borrar"):
-    if "Clientes" in st.session_state.datos:
-        st.session_state.datos.pop("Clientes")
-        st.success("Datos borrados con éxito")
-    else:
-        st.write("No hay datos para borrar")
+elif option == 'Consultar Reservas':
+    reservas = supabase.table('Reservas').select('*').execute()
+    df_reservas = pd.DataFrame(reservas.data)
+    st.write(df_reservas)
+
+elif option == 'Consultar Ventas':
+    ventas = supabase.table('Ventas').select('*').execute()
+    df_ventas = pd.DataFrame(ventas.data)
+    st.write(df_ventas)
+
+elif option == 'Consultar Promociones':
+    promociones = supabase.table('Promociones').select('*').execute()
+    df_promociones = pd.DataFrame(promociones.data)
+    st.write(df_promociones)
+
+elif option == 'Generar Reserva':
+    # Datos del cliente
+    cliente_id = st.number_input("ID del Cliente", min_value=1)
+    
+    # Datos de la habitación
+    habitaciones = supabase.table('Habitaciones').select('*').execute()
+    df_habitaciones = pd.DataFrame(habitaciones.data)
+    selected_habitacion = st.selectbox("Seleccione una habitación", df_habitaciones['id_habitacion'])
+    
+    # Fechas de la reserva
+    fecha_inicio = st.date_input("Fecha de Inicio")
+    fecha_fin = st.date_input("Fecha de Fin")
+    
+    # Generar reserva
+    if st.button('Generar Reserva'):
+        reserva = supabase.table('Reservas').insert({
+            'id_cliente': cliente_id,
+            'id_habitacion': selected_habitacion,
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'estado': 'Confirmada'
+        }).execute()
+        
+        st.success(f"Reserva generada con ID: {reserva.data[0]['id_reserva']}")
