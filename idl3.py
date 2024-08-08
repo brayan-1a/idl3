@@ -3,35 +3,35 @@ import pandas as pd
 from supabase import create_client, Client
 
 # Configuración de Supabase
-url = "https://clmdobighgagqdqwfclt.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbWRvYmlnaGdhZ3FkcXdmY2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0NzMzMDYsImV4cCI6MjAzODA0OTMwNn0.7pncUo2SvBwi1Jnxl863e9-omO8fGulmZC3_zhUVFTM"
+url = "https://cdubgkqitwvtbwtojjrw.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkdWJna3FpdHd2dGJ3dG9qanJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNDU5MDMsImV4cCI6MjAzODcyMTkwM30.2tir9-ogeojL_ueU3ogD1MD9p76GJ5OoVyKVCXKpphM"
 
 # Crear cliente de Supabase
 supabase: Client = create_client(url, key)
 
 # Funciones para interactuar con las tablas
 def get_clientes():
-    response = supabase.from_("hotel.clientes").select("*")
+    response = supabase.from_("clientes").select("*")
     return response.execute()
 
 def get_habitaciones():
-    response = supabase.from_("hotel.habitaciones").select("*")
+    response = supabase.from_("habitaciones").select("*")
     return response.execute()
 
 def get_reservas():
-    response = supabase.from_("hotel.reservas").select("*")
+    response = supabase.from_("reservas").select("*")
     return response.execute()
 
 def get_ventas():
-    response = supabase.from_("hotel.ventas").select("*")
+    response = supabase.from_("ventas").select("*")
     return response.execute()
 
 def get_promociones():
-    response = supabase.from_("hotel.promociones").select("*")
+    response = supabase.from_("promociones").select("*")
     return response.execute()
 
 def get_promociones_reservas():
-    response = supabase.from_("hotel.promociones_reservas").select("*")
+    response = supabase.from_("promociones_reservas").select("*")
     return response.execute()
 
 # Página principal
