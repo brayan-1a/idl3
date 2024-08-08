@@ -45,6 +45,10 @@ df_clientes = pd.DataFrame(clientes.data)
 # Lista desplegable para seleccionar la tabla
 tabla_seleccionada = st.selectbox("Seleccione una tabla", ["Clientes", "Habitaciones", "Reservas", "Ventas", "Promociones", "Promociones-reservas"])
 
+# Estado de la aplicación
+if 'datos' not in st.session_state:
+    st.session_state.datos = {}
+
 # Botón para agregar datos
 if st.button("Agregar"):
     if tabla_seleccionada == "Clientes":
@@ -54,6 +58,7 @@ if st.button("Agregar"):
         telefono = st.text_input("Teléfono")
         if st.button("Guardar"):
             supabase.from_("clientes").insert({"nombre": nombre, "apellido": apellido, "email": email, "telefono": telefono}).execute()
+            st.session_state.datos[tabla_seleccionada] = pd.DataFrame({'Nombre': [nombre], 'Apellido': [apellido], 'Email': [email], 'Teléfono': [telefono]})
             st.success("Datos agregados con éxito")
     elif tabla_seleccionada == "Habitaciones":
         tipo = st.selectbox("Tipo", ["Simple", "Doble", "Suite"])
@@ -61,33 +66,22 @@ if st.button("Agregar"):
         estado = st.selectbox("Estado", ["Disponible", "Ocupada", "En mantenimiento"])
         if st.button("Guardar"):
             supabase.from_("habitaciones").insert({"tipo": tipo, "precio_por_noche": precio_por_noche, "estado": estado}).execute()
+            st.session_state.datos[tabla_seleccionada] = pd.DataFrame({'Tipo': [tipo], 'Precio por noche': [precio_por_noche], 'Estado': [estado]})
             st.success("Datos agregados con éxito")
     # Agregar más casos para cada tabla
 
 # Botón para ver la tabla actualizada
 if st.button("Ver tabla"):
-    if tabla_seleccionada == "Clientes":
-        clientes = get_clientes()
-        df_clientes = pd.DataFrame(clientes.data)
-        st.write(df_clientes)
-    elif tabla_seleccionada == "Habitaciones":
-        habitaciones = get_habitaciones()
-        df_habitaciones = pd.DataFrame(habitaciones.data)
-        st.write(df_habitaciones)
-    # Agregar más casos para cada tabla
+    if tabla_seleccionada in st.session_state.datos:
+        st.write(st.session_state.datos[tabla_seleccionada])
+    else:
+        st.write("No hay datos para mostrar")
 
 # Botón para borrar datos
 if st.button("Borrar"):
-    if tabla_seleccionada == "Clientes":
-        id_cliente = st.number_input("ID del cliente")
-        if st.button("Borrar"):
-            supabase.from_("clientes").delete().eq("id_cliente", id_cliente).execute()
-            st.success("Datos borrados con éxito")
-    elif tabla_seleccionada == "Habitaciones":
-        id_habitacion = st.number_input("ID de la habitación")
-        if st.button("Borrar"):
-            supabase.from_("habitaciones").delete().eq("id_habitacion", id_habitacion).execute()
-            st.success("Datos borrados con éxito")
-    # Agregar más casos para cada tabla
-
+    if tabla_seleccionada in st.session_state.datos:
+        st.session_state.datos.pop(tabla_seleccionada)
+        st.success("Datos borrados con éxito")
+    else:
+        st.write("No hay datos para borrar")
 
