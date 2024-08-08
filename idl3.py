@@ -16,27 +16,27 @@ option = st.sidebar.selectbox(
 )
 
 if option == 'Consultar Clientes':
-    clientes = supabase.table('hotel.Clientes').select('*').execute()
+    clientes = supabase.table('hotel.clientes').select('*').execute()
     df_clientes = pd.DataFrame(clientes.data)
     st.write(df_clientes)
 
 elif option == 'Consultar Habitaciones':
-    habitaciones = supabase.table('hotel.Habitaciones').select('*').execute()
+    habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
     df_habitaciones = pd.DataFrame(habitaciones.data)
     st.write(df_habitaciones)
 
 elif option == 'Consultar Reservas':
-    reservas = supabase.table('hotel.Reservas').select('*').execute()
+    reservas = supabase.table('hotel.reservas').select('*').execute()
     df_reservas = pd.DataFrame(reservas.data)
     st.write(df_reservas)
 
 elif option == 'Consultar Ventas':
-    ventas = supabase.table('hotel.Ventas').select('*').execute()
+    ventas = supabase.table('hotel.ventas').select('*').execute()
     df_ventas = pd.DataFrame(ventas.data)
     st.write(df_ventas)
 
 elif option == 'Consultar Promociones':
-    promociones = supabase.table('hotel.Promociones').select('*').execute()
+    promociones = supabase.table('hotel.promociones').select('*').execute()
     df_promociones = pd.DataFrame(promociones.data)
     st.write(df_promociones)
 
@@ -47,7 +47,7 @@ elif option == 'Generar Reserva':
     cliente_id = st.number_input("ID del Cliente", min_value=1)
     
     # Selección de habitación
-    habitaciones = supabase.table('hotel.Habitaciones').select('*').execute()
+    habitaciones = supabase.table('hotel.habitaciones').select('*').execute()
     df_habitaciones = pd.DataFrame(habitaciones.data)
     selected_habitacion = st.selectbox("Seleccione habitación", df_habitaciones['id_habitacion'])
     
@@ -56,7 +56,7 @@ elif option == 'Generar Reserva':
     fecha_fin = st.date_input("Fecha de fin")
     
     if st.button('Crear Reserva'):
-        reserva = supabase.table('hotel.Reservas').insert({
+        reserva = supabase.table('hotel.reservas').insert({
             'id_cliente': cliente_id,
             'id_habitacion': selected_habitacion,
             'fecha_inicio': fecha_inicio,
@@ -66,5 +66,6 @@ elif option == 'Generar Reserva':
         if reserva.status_code == 201:
             st.success("Reserva creada exitosamente")
         else:
-            st.error("Error al crear la reserva")
+            st.error(f"Error al crear la reserva: {reserva.error_message}")
+
 
