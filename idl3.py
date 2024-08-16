@@ -12,13 +12,11 @@ supabase: Client = create_client(URL, KEY)
 # Configuración de la página
 st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", layout="wide")
 
-# Fondo personalizado usando CSS con imagen
+# Fondo personalizado usando CSS con color sólido
 st.markdown("""
     <style>
         .css-1y4n0k9 {
-            background-image: url('/assets/fondo.jpg');
-            background-size: cover;
-            background-position: center;
+            background-color: #f0f0f0; /* Color de fondo gris claro */
             padding: 2rem;
         }
         .header {
@@ -50,7 +48,7 @@ st.markdown("""
 st.markdown('<div class="header">Sistema de Gestión de Hotel</div>', unsafe_allow_html=True)
 
 # Menú de navegación
-tabs = st.tabs(['Consultar Datos', 'Agregar Datos'])
+tabs = st.tabs(['Consultar Datos', 'Agregar Datos', 'Configuración'])
 
 # Consultar Datos
 with tabs[0]:
@@ -131,4 +129,10 @@ with tabs[1]:
         }
         fields['descuento'] = {'field_type': 'number', 'default_value': 10.0}  # Default value of 10.0
         add_record('promociones', fields)
+
+# Configuración (pestaña adicional)
+with tabs[2]:
+    st.header("Configuración")
+    st.write("Aquí puedes agregar opciones para configurar la aplicación o ajustar parámetros.")
+
 
