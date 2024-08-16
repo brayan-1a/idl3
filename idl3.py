@@ -38,134 +38,90 @@ st.markdown("""
         .stButton>button:hover {
             background-color: #45a049; /* Color más oscuro al pasar el cursor */
         }
-        .form-container {
-            background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con transparencia */
-            padding: 1rem;
-            border-radius: 5px;
-            margin: 1rem 0;
-        }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="header">Sistema de Gestión de Hotel</div>', unsafe_allow_html=True)
 
-# Selección de operación
-option = st.sidebar.selectbox(
-    '¿Qué operación desea realizar?',
-    ('Consultar Clientes', 'Consultar Habitaciones', 'Consultar Reservas', 'Consultar Ventas', 'Consultar Promociones', 
-     'Generar Reserva', 'Agregar Cliente', 'Agregar Habitación', 'Agregar Promoción')
-)
+# Menú de navegación
+tabs = st.tabs(['Consultar Datos', 'Agregar Datos'])
 
-# Consultar datos
-if option == 'Consultar Clientes':
-    clientes = supabase.table('clientes').select('*').execute()
-    df_clientes = pd.DataFrame(clientes.data)
-    st.write(df_clientes)
+# Consultar Datos
+with tabs[0]:
+    st.header("Consultar Datos")
+    option = st.selectbox(
+        'Seleccione la tabla para consultar',
+        ('Clientes', 'Habitaciones', 'Reservas', 'Ventas', 'Promociones')
+    )
 
-    if st.button('Exportar Clientes a CSV'):
-        df_clientes.to_csv('clientes.csv', index=False)
-        st.success("Archivo CSV exportado exitosamente")
+    def display_table(table_name: str):
+        try:
+            data = supabase.table(table_name.lower()).select('*').execute()
+            df = pd.DataFrame(data.data)
+            st.write(df)
+            if st.button(f'Exportar {table_name} a CSV'):
+                df.to_csv(f'{table_name.lower()}.csv', index=False)
+                st.success(f"Archivo CSV exportado exitosamente para {table_name}")
+        except Exception as e:
+            st.error(f"Ocurrió un error al consultar {table_name}: {e}")
 
-elif option == 'Consultar Habitaciones':
-    habitaciones = supabase.table('habitaciones').select('*').execute()
-    df_habitaciones = pd.DataFrame(habitaciones.data)
-    st.write(df_habitaciones)
+    display_table(option)
 
-elif option == 'Consultar Reservas':
-    reservas = supabase.table('reservas').select('*').execute()
-    df_reservas = pd.DataFrame(reservas.data)
-    st.write(df_reservas)
-
-elif option == 'Consultar Ventas':
-    ventas = supabase.table('ventas').select('*').execute()
-    df_ventas = pd.DataFrame(ventas.data)
-    st.write(df_ventas)
-
-elif option == 'Consultar Promociones':
-    promociones = supabase.table('promociones').select('*').execute()
-    df_promociones = pd.DataFrame(promociones.data)
-    st.write(df_promociones)
-
-# Generar Reserva
-elif option == 'Generar Reserva':
-    st.markdown('<div class="form-container">', unsafe_allow_html=True)
-    cliente_id = st.number_input("ID del Cliente", min_value=1)
-    habitaciones = supabase.table('habitaciones').select('*').execute()
-    df_habitaciones = pd.DataFrame(habitaciones.data)
-    selected_habitacion = st.selectbox("Seleccione una habitación", df_habitaciones['id_habitacion'])
-    fecha_inicio = st.date_input("Fecha de Inicio")
-    fecha_fin = st.date_input("Fecha de Fin")
+# Agregar Datos
+with tabs[1]:
+    st.header("Agregar Datos")
     
-    if st.button('Generar Reserva'):
-        reserva = supabase.table('reservas').insert({
-            'id_cliente': cliente_id,
-            'id_habitacion': selected_habitacion,
-            'fecha_inicio': fecha_inicio,
-            'fecha_fin': fecha_fin,
-            'estado': 'Confirmada'
-        }).execute()
-        st.success(f"Reserva generada con ID: {reserva.data[0]['id_reserva']}")
-    st.markdown('</div>', unsafe_allow_html=True)
+    add_option = st.selectbox(
+        'Seleccione la tabla para agregar datos',
+        ('Clientes', 'Habitaciones', 'Promociones')
+    )
 
-# Agregar Cliente
-elif option == 'Agregar Cliente':
-    st.markdown('<div class="form-container">', unsafe_allow_html=True)
-    with st.form(key='form_cliente'):
-        nombre = st.text_input("Nombre")
-        apellido = st.text_input("Apellido")
-        email = st.text_input("Email")
-        telefono = st.text_input("Teléfono")
-        submit_button = st.form_submit_button(label='Guardar Cliente')
+    def add_record(table_name: str, fields: dict):
+        with st.form(key=f'form_{table_name}'):
+            for field, field_type in fields.items():
+                if field_type == 'text':
+                    value = st.text_input(field.capitalize())
+                elif field_type == 'number':
+                    value = st.number_input(field.capitalize(), min_value=0.0, value=fields.get('default_value', 0.0))
+                elif field_type == 'select':
+                    options = fields[field]
+                    value = st.selectbox(field.capitalize(), options)
+                elif field_type == 'date':
+                    value = st.date_input(field.capitalize())
+                fields[field] = value
+            submit_button = st.form_submit_button(label=f'Guardar {table_name}')
+        
+        if submit_button:
+            try:
+                supabase.table(table_name.lower()).insert(fields).execute()
+                st.success(f"{table_name} agregado exitosamente")
+            except Exception as e:
+                st.error(f"Ocurrió un error al agregar {table_name}: {e}")
 
-    if submit_button:
-        supabase.table('clientes').insert({
-            'nombre': nombre,
-            'apellido': apellido,
-            'email': email,
-            'telefono': telefono
-        }).execute()
-        st.success("Cliente agregado exitosamente")
-    st.markdown('</div>', unsafe_allow_html=True)
+    if add_option == 'Clientes':
+        fields = {
+            'nombre': 'text',
+            'apellido': 'text',
+            'email': 'text',
+            'telefono': 'text'
+        }
+        add_record('clientes', fields)
 
-# Agregar Habitación
-elif option == 'Agregar Habitación':
-    st.markdown('<div class="form-container">', unsafe_allow_html=True)
-    with st.form(key='form_habitacion'):
-        tipo = st.selectbox("Tipo de Habitación", ["Simple", "Doble", "Suite"])
-        precio_por_noche = st.number_input("Precio por Noche", min_value=0.0, format="%.2f")
-        estado = st.selectbox("Estado", ["Disponible", "Ocupada", "En mantenimiento"])
-        submit_button = st.form_submit_button(label='Guardar Habitación')
+    elif add_option == 'Habitaciones':
+        fields = {
+            'tipo': 'select',  # Options will be filled below
+            'precio_por_noche': 'number',
+            'estado': 'select'  # Options will be filled below
+        }
+        fields['precio_por_noche'] = {'field_type': 'number', 'default_value': 50.0}  # Default value of 50.0
+        add_record('habitaciones', fields)
 
-    if submit_button:
-        supabase.table('habitaciones').insert({
-            'tipo': tipo,
-            'precio_por_noche': precio_por_noche,
-            'estado': estado
-        }).execute()
-        st.success("Habitación agregada exitosamente")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Agregar Promoción
-elif option == 'Agregar Promoción':
-    st.markdown('<div class="form-container">', unsafe_allow_html=True)
-    with st.form(key='form_promocion'):
-        descripcion = st.text_input("Descripción de la Promoción")
-        descuento = st.number_input("Descuento (%)", min_value=0, max_value=100)
-        fecha_inicio = st.date_input("Fecha de Inicio")
-        fecha_fin = st.date_input("Fecha de Fin")
-        submit_button = st.form_submit_button(label='Guardar Promoción')
-
-    if submit_button:
-        supabase.table('promociones').insert({
-            'descripcion': descripcion,
-            'descuento': descuento,
-            'fecha_inicio': fecha_inicio,
-            'fecha_fin': fecha_fin
-        }).execute()
-        st.success("Promoción agregada exitosamente")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
+    elif add_option == 'Promociones':
+        fields = {
+            'descripcion': 'text',
+            'descuento': 'number',
+            'fecha_inicio': 'date',
+            'fecha_fin': 'date'
+        }
+        fields['descuento'] = {'field_type': 'number', 'default_value': 10.0}  # Default value of 10.0
+        add_record('promociones', fields)
