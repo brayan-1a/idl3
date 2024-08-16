@@ -14,7 +14,7 @@ st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", 
 st.markdown("""
     <style>
         .main {
-            background-color: #F4F4F9; /* Color de fondo principal */
+            background-color: #F7F7F7; /* Color de fondo claro */
             padding: 2rem;
         }
         .header {
@@ -26,14 +26,14 @@ st.markdown("""
             border-radius: 5px;
         }
         .recuadro {
-            background-color: #FFFFFF; /* Blanco para los recuadros de contenido y formularios */
+            background-color: #F5F5DC; /* Beige para los recuadros de contenido y formularios */
             border: 1px solid #E0E0E0; /* Gris claro para los bordes */
             padding: 2rem;
             border-radius: 5px;
             margin-top: 1rem;
         }
         .stButton>button {
-            background-color: #00796b; /* Verde brillante para los botones */
+            background-color: #004d40; /* Verde oscuro para los botones */
             color: white;
             border: None;
             border-radius: 5px;
