@@ -1,22 +1,20 @@
 import streamlit as st
 from supabase import create_client, Client
 import pandas as pd
+import datetime
 
 # Configuración de Supabase
 URL = "https://cdubgkqitwvtbwtojjrw.supabase.co"
 KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkdWJna3FpdHd2dGJ3dG9qanJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNDU5MDMsImV4cCI6MjAzODcyMTkwM30.2tir9-ogeojL_ueU3ogD1MD9p76GJ5OoVyKVCXKpphM"
-
-# Crear cliente de Supabase
 supabase: Client = create_client(URL, KEY)
 
-# Configuración de la página
 st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", layout="wide")
 
-# Fondo personalizado usando CSS con color sólido
+# Fondo personalizado usando CSS con color de fondo
 st.markdown("""
     <style>
-        .css-1y4n0k9 {
-            background-color: #f0f0f0; /* Color de fondo gris claro */
+        .main {
+            background-color: #f5f5f5; /* Color de fondo claro */
             padding: 2rem;
         }
         .header {
@@ -36,19 +34,13 @@ st.markdown("""
         .stButton>button:hover {
             background-color: #45a049; /* Color más oscuro al pasar el cursor */
         }
-        .form-container {
-            background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con transparencia */
-            padding: 1rem;
-            border-radius: 5px;
-            margin: 1rem 0;
-        }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="header">Sistema de Gestión de Hotel</div>', unsafe_allow_html=True)
 
 # Menú de navegación
-tabs = st.tabs(['Consultar Datos', 'Agregar Datos', 'Configuración'])
+tabs = st.tabs(['Consultar Datos', 'Agregar Datos', 'Generar Reportes'])
 
 # Consultar Datos
 with tabs[0]:
@@ -130,9 +122,50 @@ with tabs[1]:
         fields['descuento'] = {'field_type': 'number', 'default_value': 10.0}  # Default value of 10.0
         add_record('promociones', fields)
 
-# Configuración (pestaña adicional)
+# Generar Reportes
 with tabs[2]:
-    st.header("Configuración")
-    st.write("Aquí puedes agregar opciones para configurar la aplicación o ajustar parámetros.")
+    st.header("Generar Reportes")
+    
+    report_option = st.selectbox(
+        'Seleccione el tipo de reporte',
+        ('Reporte de Clientes', 'Reporte de Reservas', 'Reporte de Ventas', 'Reporte de Promociones')
+    )
+
+    def generate_report(report_type: str):
+        try:
+            if report_type == 'Reporte de Clientes':
+                st.subheader("Clientes Registrados")
+                start_date = st.date_input("Fecha de Inicio", datetime.date(2023, 1, 1))
+                end_date = st.date_input("Fecha de Fin", datetime.date.today())
+                query = supabase.table('clientes').select('*').gte('fecha_registro', start_date).lte('fecha_registro', end_date).execute()
+                df = pd.DataFrame(query.data)
+                st.write(df)
+
+            elif report_type == 'Reporte de Reservas':
+                st.subheader("Reservas en el Rango de Fechas")
+                start_date = st.date_input("Fecha de Inicio", datetime.date(2023, 1, 1))
+                end_date = st.date_input("Fecha de Fin", datetime.date.today())
+                query = supabase.table('reservas').select('*').gte('fecha_inicio', start_date).lte('fecha_fin', end_date).execute()
+                df = pd.DataFrame(query.data)
+                st.write(df)
+
+            elif report_type == 'Reporte de Ventas':
+                st.subheader("Ventas Totales")
+                start_date = st.date_input("Fecha de Inicio", datetime.date(2023, 1, 1))
+                end_date = st.date_input("Fecha de Fin", datetime.date.today())
+                query = supabase.table('ventas').select('*').gte('fecha', start_date).lte('fecha', end_date).execute()
+                df = pd.DataFrame(query.data)
+                st.write(df)
+
+            elif report_type == 'Reporte de Promociones':
+                st.subheader("Promociones Activas")
+                query = supabase.table('promociones').select('*').lte('fecha_fin', datetime.date.today()).execute()
+                df = pd.DataFrame(query.data)
+                st.write(df)
+                
+        except Exception as e:
+            st.error(f"Ocurrió un error al generar el reporte: {e}")
+
+    generate_report(report_option)
 
 
