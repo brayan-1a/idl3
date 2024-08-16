@@ -11,7 +11,24 @@ supabase: Client = create_client(URL, KEY)
 
 st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", layout="wide")
 
-st.title("Sistema de Gestión de Hotel")
+# Fondo personalizado usando CSS
+st.markdown("""
+    <style>
+        .main {
+            background-color: #f0f0f0;
+            padding: 2rem;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="header">Sistema de Gestión de Hotel</div>', unsafe_allow_html=True)
 
 # Menú de navegación
 tabs = st.tabs(['Consultar Datos', 'Agregar Datos'])
@@ -52,7 +69,7 @@ with tabs[1]:
                 if field_type == 'text':
                     value = st.text_input(field.capitalize())
                 elif field_type == 'number':
-                    value = st.number_input(field.capitalize(), min_value=0)
+                    value = st.number_input(field.capitalize(), min_value=0.0, value=fields.get('default_value', 0.0))
                 elif field_type == 'select':
                     options = fields[field]
                     value = st.selectbox(field.capitalize(), options)
@@ -83,6 +100,7 @@ with tabs[1]:
             'precio_por_noche': 'number',
             'estado': 'select'  # Options will be filled below
         }
+        fields['precio_por_noche'] = {'field_type': 'number', 'default_value': 50.0}  # Default value of 50.0
         add_record('habitaciones', fields)
 
     elif add_option == 'Promociones':
@@ -92,7 +110,9 @@ with tabs[1]:
             'fecha_inicio': 'date',
             'fecha_fin': 'date'
         }
+        fields['descuento'] = {'field_type': 'number', 'default_value': 10.0}  # Default value of 10.0
         add_record('promociones', fields)
+
 
 
 
