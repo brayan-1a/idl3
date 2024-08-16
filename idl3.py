@@ -1,48 +1,51 @@
 import streamlit as st
 from supabase import create_client, Client
 import os
-# Cargar variables de entorno
-load_dotenv()
 
-# Configurar conexión a Supabase
-url: str = os.getenv("https://cdubgkqitwvtbwtojjrw.supabase.co")
-key: str = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkdWJna3FpdHd2dGJ3dG9qanJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNDU5MDMsImV4cCI6MjAzODcyMTkwM30.2tir9-ogeojL_ueU3ogD1MD9p76GJ5OoVyKVCXKpphM")
-supabase: Client = create_client(url, key)
+# Configurar conexión a Supabase usando variables de entorno
+url: str = os.getenv("https://cdubgkqitwvtbwtojjrw.supabase.co")  # URL de Supabase, debe estar configurada en Streamlit Cloud o tu entorno local
+key: str = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkdWJna3FpdHd2dGJ3dG9qanJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNDU5MDMsImV4cCI6MjAzODcyMTkwM30.2tir9-ogeojL_ueU3ogD1MD9p76GJ5OoVyKVCXKpphM")  # Clave API de Supabase, debe estar configurada en Streamlit Cloud o tu entorno local
 
-# Función para obtener datos de una tabla
-def get_data(table_name: str):
-    response = supabase.table(table_name).select("*").execute()
-    return response.data
+# Verificar si las variables están correctamente configuradas
+if url is None or key is None:
+    st.error("Las variables de entorno SUPABASE_URL y SUPABASE_KEY no están configuradas.")
+else:
+    supabase: Client = create_client(url, key)
 
-# Interfaz de usuario
-st.title("Gestión del Hotel")
+    # Función para obtener datos de una tabla
+    def get_data(table_name: str):
+        response = supabase.table(table_name).select("*").execute()
+        return response.data
 
-# Mostrar datos de clientes
-st.header("Clientes")
-clientes = get_data("Clientes")
-st.write(clientes)
+    # Interfaz de usuario
+    st.title("Gestión del Hotel")
 
-# Agregar nuevo cliente
-st.subheader("Agregar Nuevo Cliente")
-with st.form("add_client"):
-    nombre = st.text_input("Nombre")
-    apellido = st.text_input("Apellido")
-    email = st.text_input("Email")
-    telefono = st.text_input("Teléfono")
-    direccion = st.text_input("Dirección")
-    if st.form_submit_button("Agregar Cliente"):
-        supabase.table("Clientes").insert({
-            "nombre": nombre,
-            "apellido": apellido,
-            "email": email,
-            "telefono": telefono,
-            "direccion": direccion
-        }).execute()
-        st.success("Cliente agregado exitosamente!")
+    # Mostrar datos de clientes
+    st.header("Clientes")
+    clientes = get_data("Clientes")
+    st.write(clientes)
 
-# Calificación
-st.header("Calificación de Habitaciones")
-calificacion = st.slider("Califica tu estancia (1-5 estrellas)", 1, 5)
-if st.button("Enviar Calificación"):
-    # Aquí podrías guardar la calificación en la base de datos
-    st.success(f"Calificación enviada: {calificacion} estrellas")
+    # Agregar nuevo cliente
+    st.subheader("Agregar Nuevo Cliente")
+    with st.form("add_client"):
+        nombre = st.text_input("Nombre")
+        apellido = st.text_input("Apellido")
+        email = st.text_input("Email")
+        telefono = st.text_input("Teléfono")
+        direccion = st.text_input("Dirección")
+        if st.form_submit_button("Agregar Cliente"):
+            supabase.table("Clientes").insert({
+                "nombre": nombre,
+                "apellido": apellido,
+                "email": email,
+                "telefono": telefono,
+                "direccion": direccion
+            }).execute()
+            st.success("Cliente agregado exitosamente!")
+
+    # Calificación
+    st.header("Calificación de Habitaciones")
+    calificacion = st.slider("Califica tu estancia (1-5 estrellas)", 1, 5)
+    if st.button("Enviar Calificación"):
+        # Aquí podrías guardar la calificación en la base de datos
+        st.success(f"Calificación enviada: {calificacion} estrellas")
