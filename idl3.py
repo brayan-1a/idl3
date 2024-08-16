@@ -14,7 +14,7 @@ st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", 
 st.markdown("""
     <style>
         .main {
-            background-color: #86d6f0; /* Color de fondo celeste */
+            background-color: #F5F5DC; /* Color de fondo */
             padding: 2rem;
         }
         .header {
