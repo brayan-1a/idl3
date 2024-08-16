@@ -15,8 +15,8 @@ st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", 
 # Fondo personalizado usando CSS con imagen
 st.markdown("""
     <style>
-        .main {
-            background-image: url('assets/fondo.jpg');
+        .css-1y4n0k9 {
+            background-image: url('/assets/fondo.jpg');
             background-size: cover;
             background-position: center;
             padding: 2rem;
@@ -37,6 +37,12 @@ st.markdown("""
         }
         .stButton>button:hover {
             background-color: #45a049; /* Color más oscuro al pasar el cursor */
+        }
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con transparencia */
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -125,3 +131,4 @@ with tabs[1]:
         }
         fields['descuento'] = {'field_type': 'number', 'default_value': 10.0}  # Default value of 10.0
         add_record('promociones', fields)
+
