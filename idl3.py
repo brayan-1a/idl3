@@ -14,11 +14,11 @@ st.set_page_config(page_title="Sistema de Gestión de Hotel", page_icon="🏨", 
 st.markdown("""
     <style>
         .main {
-            background-color: #ADD8E6; /* Color celeste */
+            background-color: #F4F4F9; /* Color de fondo principal */
             padding: 2rem;
         }
         .header {
-            background-color: rgba(76, 175, 80, 0.8); /* Verde con transparencia */
+            background-color: #004d40; /* Verde oscuro para el encabezado */
             color: white;
             padding: 1rem;
             text-align: center;
@@ -26,13 +26,25 @@ st.markdown("""
             border-radius: 5px;
         }
         .stButton>button {
-            background-color: #4CAF50; /* Botones en verde */
+            background-color: #00796b; /* Verde brillante para los botones */
             color: white;
             border: None;
             border-radius: 5px;
         }
         .stButton>button:hover {
-            background-color: #45a049; /* Color más oscuro al pasar el cursor */
+            background-color: #004d40; /* Verde oscuro al pasar el ratón */
+        }
+        .stTextInput>input {
+            color: #333333; /* Color de texto en campos de entrada */
+        }
+        .stSelectbox>div>div>div {
+            color: #333333; /* Color de texto en selectores */
+        }
+        .stDateInput>div>div>div {
+            color: #333333; /* Color de texto en selectores de fecha */
+        }
+        .stMarkdown {
+            color: #333333; /* Color de texto en markdown */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -167,5 +179,6 @@ with tabs[2]:
             st.error(f"Ocurrió un error al generar el reporte: {e}")
 
     generate_report(report_option)
+
 
 
