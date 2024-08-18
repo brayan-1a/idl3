@@ -53,7 +53,7 @@ st.markdown("""
 st.markdown('<div class="header">Sistema de Gestión de Hotel</div>', unsafe_allow_html=True)
 
 # Menú de navegación
-tabs = st.tabs(['Consultar Datos', 'Agregar Datos', 'Generar Reportes'])
+tabs = st.tabs(['Consultar Datos', 'Agregar Datos', 'Actualizar Datos', 'Eliminar Datos', 'Generar Reportes'])
 
 # Consultar Datos
 with tabs[0]:
@@ -141,7 +141,7 @@ with tabs[1]:
         st.markdown('</div>', unsafe_allow_html=True)
 
 # Actualizar Datos
-with tabs[1]:
+with tabs[2]:
     st.header("Actualizar Datos")
     with st.container():
         st.markdown('<div class="recuadro">', unsafe_allow_html=True)
@@ -151,7 +151,7 @@ with tabs[1]:
         )
 
         def update_record(table_name: str, fields: dict):
-            with st.form(key=f'form_{table_name}'):
+            with st.form(key=f'form_update_{table_name}'):
                 for field, field_type in fields.items():
                     if field_type == 'text':
                         value = st.text_input(field.capitalize())
@@ -202,7 +202,7 @@ with tabs[1]:
         st.markdown('</div>', unsafe_allow_html=True)
 
 # Eliminar Datos
-with tabs[1]:
+with tabs[3]:
     st.header("Eliminar Datos")
     with st.container():
         st.markdown('<div class="recuadro">', unsafe_allow_html=True)
@@ -239,7 +239,7 @@ def handle_error(error_message):
     st.error(error_message)
 
 # Generar Reportes
-with tabs[2]:
+with tabs[4]:
     st.header("Generar Reportes")
     with st.container():
         st.markdown('<div class="recuadro">', unsafe_allow_html=True)
