@@ -213,7 +213,9 @@ with tabs[3]:
 
         def delete_record(table_name: str):
             try:
-                supabase.table(table_name.lower()).delete().execute()
+                st.write("Ingrese el ID del registro a eliminar:")
+                id_registro = st.number_input("ID del registro", min_value=0, value=0)
+                supabase.table(table_name.lower()).delete().eq('id', id_registro).execute()
                 st.success(f"{table_name} eliminado exitosamente")
             except Exception as e:
                 st.error(f"Ocurrió un error al eliminar {table_name}: {e}")
